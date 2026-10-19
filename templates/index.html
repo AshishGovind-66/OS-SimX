@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OS-SimX | Operating System Simulator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-icon">OS</div><div><strong>OS-SimX</strong><small>Operating Systems Lab</small></div></div>
+    <div class="nav-label">WORKSPACE</div>
+    <button class="nav-item active" data-view="cpu"><span>◫</span> CPU Scheduler</button>
+    <button class="nav-item" data-view="memory"><span>▦</span> Memory Manager</button>
+    <button class="nav-item" data-view="deadlock"><span>⛓</span> Deadlock Lab</button>
+    <div class="sidebar-bottom"><span class="live-dot"></span> Simulation engine ready<div class="sidebar-note">Educational simulator · v1.0</div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar"><div><span class="eyebrow">SYSTEMS ENGINEERING / LAB</span><h1 id="page-title">CPU Scheduler</h1></div><div class="top-status"><span class="live-dot"></span> LOCAL SIMULATION <span class="pill">DEMO MODE</span></div></header>
+
+    <section class="view active" id="view-cpu">
+      <div class="hero"><div><div class="hero-kicker">PROCESS MANAGEMENT</div><h2>See the scheduler<br><em>at work.</em></h2><p>Configure processes, run classic CPU scheduling algorithms, and inspect the timeline and performance metrics.</p></div><div class="hero-art"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="cpu-chip"><span>CPU</span><strong>↔</strong><small>SCHEDULER</small></div><i class="node node-a"></i><i class="node node-b"></i><i class="node node-c"></i></div></div>
+
+      <div class="metric-grid">
+        <div class="metric-card"><span>PROCESSES</span><strong id="metric-processes">—</strong><small>In current simulation</small></div>
+        <div class="metric-card"><span>AVG. WAITING TIME</span><strong id="metric-wait">—</strong><small>Time units</small></div>
+        <div class="metric-card"><span>AVG. TURNAROUND</span><strong id="metric-turn">—</strong><small>Time units</small></div>
+        <div class="metric-card"><span>AVG. RESPONSE</span><strong id="metric-response">—</strong><small>Time units</small></div>
+      </div>
+
+      <div class="content-grid">
+        <section class="panel process-panel">
+          <div class="panel-heading"><div><span class="section-index">01 / INPUT</span><h3>Process table</h3></div><button class="text-button" id="reset-processes">↺ Reset sample</button></div>
+          <p class="muted">Arrival and burst times are measured in abstract time units. Lower priority number means higher priority.</p>
+          <div class="table-wrap"><table id="process-table"><thead><tr><th>PID</th><th>ARRIVAL</th><th>BURST</th><th>PRIORITY</th><th></th></tr></thead><tbody></tbody></table></div>
+          <button class="add-button" id="add-process">＋ Add process</button>
+          <div class="run-row"><label>ALGORITHM<select id="algorithm"><option value="FCFS">FCFS · First Come First Served</option><option value="SJF">SJF · Shortest Job First</option><option value="SRTF">SRTF · Shortest Remaining Time</option><option value="RR" selected>Round Robin</option><option value="PRIORITY">Priority Scheduling</option></select></label><label id="quantum-wrap">TIME QUANTUM<input id="quantum" type="number" min="1" value="2"></label></div>
+          <button class="primary-button" id="run-simulation"><span>▶</span> Run simulation</button>
+          <div class="error-box hidden" id="cpu-error"></div>
+        </section>
+
+        <section class="panel timeline-panel">
+          <div class="panel-heading"><div><span class="section-index">02 / VISUALIZATION</span><h3>CPU execution timeline</h3></div><span class="pill" id="algorithm-pill">ROUND ROBIN</span></div>
+          <p class="muted">Each block represents a continuous CPU execution interval. Hover or focus a block for its timing.</p>
+          <div id="gantt" class="gantt empty-state">Run a simulation to generate the Gantt chart.</div>
+          <div class="legend" id="gantt-legend"></div>
+          <div class="subheading"><h4>Process metrics</h4><span class="muted">Calculated from completion times</span></div>
+          <div class="table-wrap"><table id="metrics-table"><thead><tr><th>PID</th><th>COMPLETION</th><th>TURNAROUND</th><th>WAITING</th><th>RESPONSE</th></tr></thead><tbody><tr><td colspan="5" class="empty-cell">No simulation results yet.</td></tr></tbody></table></div>
+          <div class="chart-grid"><div class="chart-card"><h4>Waiting time by process</h4><canvas id="waiting-chart"></canvas></div><div class="chart-card"><h4>Turnaround by process</h4><canvas id="turnaround-chart"></canvas></div></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="view-memory">
+      <div class="section-hero"><div><span class="hero-kicker">MEMORY MANAGEMENT</span><h2>Page replacement lab</h2><p>Compare FIFO, LRU, and Optimal page replacement policies against the same reference string.</p></div><div class="mini-graphic">▤<span>MEMORY</span></div></div>
+      <div class="content-grid memory-grid">
+        <section class="panel"><div class="panel-heading"><div><span class="section-index">01 / INPUT</span><h3>Memory configuration</h3></div></div>
+          <label class="full-label">PAGE REFERENCE STRING<input id="page-refs" value="7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2" placeholder="7, 0, 1, 2, 0, 3"></label>
+          <div class="form-row"><label>FRAME COUNT<input id="frame-count" type="number" min="1" max="20" value="3"></label><label>ALGORITHM<select id="page-algorithm"><option>FIFO</option><option selected>LRU</option><option value="OPTIMAL">Optimal</option></select></label></div>
+          <button class="primary-button" id="run-memory">▶ Simulate page replacement</button><div class="error-box hidden" id="memory-error"></div>
+        </section>
+        <section class="panel"><div class="panel-heading"><div><span class="section-index">02 / RESULTS</span><h3>Frame-by-frame trace</h3></div><span class="pill" id="memory-pill">LRU</span></div>
+          <div class="metric-grid compact"><div class="metric-card"><span>PAGE FAULTS</span><strong id="page-faults">—</strong></div><div class="metric-card"><span>PAGE HITS</span><strong id="page-hits">—</strong></div><div class="metric-card"><span>FAULT RATE</span><strong id="page-rate">—</strong></div></div>
+          <div class="table-wrap memory-table-wrap"><table id="memory-table"><thead></thead><tbody><tr><td class="empty-cell">Run a simulation to see frame states.</td></tr></tbody></table></div>
+          <div class="chart-card"><h4>Faults vs hits</h4><canvas id="memory-chart"></canvas></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="view-deadlock">
+      <div class="section-hero"><div><span class="hero-kicker">RESOURCE ALLOCATION</span><h2>Deadlock lab</h2><p>Explore deadlock detection and Banker's safety algorithm using editable resource matrices.</p></div><div class="mini-graphic">⛓<span>RESOURCES</span></div></div>
+      <div class="content-grid deadlock-grid">
+        <section class="panel"><div class="panel-heading"><div><span class="section-index">01 / CONFIGURATION</span><h3>Resource state</h3></div><button class="text-button" id="deadlock-sample">↺ Load sample</button></div>
+          <p class="muted">Use comma-separated rows. Each row represents one process; each column represents a resource type.</p>
+          <label class="full-label">ALLOCATION MATRIX<textarea id="allocation-matrix" rows="3">0, 1, 0&#10;2, 0, 0&#10;3, 0, 2</textarea></label>
+          <label class="full-label">CURRENT REQUEST MATRIX<textarea id="request-matrix" rows="3">0, 0, 0&#10;0, 0, 0&#10;0, 0, 0</textarea></label>
+          <label class="full-label">AVAILABLE VECTOR<input id="available-vector" value="0, 0, 0"></label>
+          <details><summary>Optional: also check Banker's algorithm</summary><label class="full-label">MAXIMUM CLAIM MATRIX<textarea id="max-matrix" rows="3">7, 5, 3&#10;3, 2, 2&#10;9, 0, 2</textarea></label></details>
+          <button class="primary-button" id="run-deadlock">▶ Analyze resource state</button><div class="error-box hidden" id="deadlock-error"></div>
+        </section>
+        <section class="panel"><div class="panel-heading"><div><span class="section-index">02 / ANALYSIS</span><h3>Safety analysis</h3></div></div>
+          <div id="deadlock-result" class="result-box neutral"><div class="result-symbol">◎</div><div><strong>Awaiting analysis</strong><p>Run the analyzer to inspect the current resource state.</p></div></div>
+          <h4>Detection completion sequence</h4><div id="deadlock-sequence" class="sequence"><span class="muted">No sequence yet.</span></div>
+          <div id="bankers-result" class="bankers-box hidden"></div>
+        </section>
+      </div>
+    </section>
+
+    <footer><span>OS-SimX · Operating Systems Simulator</span><span>Educational simulation only · Not a real kernel scheduler</span></footer>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
